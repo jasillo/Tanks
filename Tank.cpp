@@ -10,7 +10,7 @@ Tank::Tank(Map *m)
 	position = glm::vec2(0, 0);
 	movement = glm::vec2(0, 0);
 	direction = glm::vec2(0, 1);
-	DT = 0.1;
+	DT = 0.05;
 	map = m;
 	angle = 0;
 }
@@ -54,6 +54,9 @@ void Tank::update()
 		position.y = -map->border + radius;
 	if (position.y + radius > map->border)
 		position.y = map->border - radius;
+	
+	map->collision(&position, radius);
+	
 }
 
 void Tank::free()

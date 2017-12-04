@@ -72,7 +72,7 @@ void render() {
 	glTranslatef(player.X(),0,player.Z());
 	glRotatef(180-player.getAngle(), 0, 1, 0);
 	//std::cout << player.getAngle() << std::endl;
-	glScalef(0.6, 0.6, 0.6);
+	glScalef(0.5, 0.5, 0.5);
 	models[0]->draw();
 	glPopMatrix();
 	
