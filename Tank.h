@@ -3,6 +3,7 @@
 #include <glm\gtx\rotate_vector.hpp>
 #include <vector>
 #include <iostream>
+#include "Map.h"
 
 class Tank
 {
@@ -12,12 +13,15 @@ private:
 	float speed;
 	float armor;
 	std::vector<int> bullets;
-	glm::vec2 movement;
-	glm::vec2 direction;
+	glm::vec2 movement;	
+	Map *map;
 
 public:
-	Tank();
+	Tank(Map *m);
 	float DT;
+	glm::vec2 direction;
+	float angle;
+	const float radius = 1.0;
 
 	void pressX(int x);
 	void pressZ(int z);
@@ -27,6 +31,7 @@ public:
 	float Z() { return position.y; };
 
 	void update();
+	void free();
 
 	~Tank();
 };

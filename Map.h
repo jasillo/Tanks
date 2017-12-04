@@ -4,7 +4,7 @@
 #include <string>
 #include <fstream>
 
-struct NODE {
+struct Node {
 	int StartCost; 
 	int TotalCost; 
 	int X, Y; 
@@ -13,12 +13,14 @@ struct NODE {
 
 class Map
 {
-private:
-	int **ground;
-	int tam;
+private:		
 	const std::vector< std::string> files = {"mapa1.txt", "mapa2.txt"};
+	const float H = 5.0;
 
 public:
+	int **ground;
+	int tam;
+	float border;
 	Map(int i);
 	~Map();
 };

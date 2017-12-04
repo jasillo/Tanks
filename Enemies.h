@@ -1,5 +1,7 @@
 #pragma once
 #include <glm\glm.hpp>
+#include "Map.h"
+
 class Enemies
 {
 private:
@@ -9,10 +11,12 @@ private:
 	glm::vec3 direction;
 	float armor;
 	float timer;
+	Map *map;
 
 public:
-	Enemies(int lv);
+	Enemies(int lv, Map *m);
 	void update();
+	void free();
 	~Enemies();
 };
 

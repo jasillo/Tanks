@@ -1,13 +1,12 @@
 #include "Map.h"
 
-
-
 Map::Map(int i)
 {
 	std::string line;
 	std::ifstream myfile(files[i]);
 	if (myfile.is_open())
 	{
+		
 		getline(myfile, line);
 		tam = std::stoi(line);
 		ground = new int* [tam];
@@ -27,9 +26,10 @@ Map::Map(int i)
 			}
 		}
 		myfile.close();
+		border = tam * H / 2.0;
 	}
-}
 
+}
 
 Map::~Map()
 {

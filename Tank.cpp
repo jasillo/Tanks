@@ -2,7 +2,7 @@
 
 
 
-Tank::Tank()
+Tank::Tank(Map *m)
 {
 	lifePoints = 500;
 	speed = 7.0;
@@ -11,6 +11,8 @@ Tank::Tank()
 	movement = glm::vec2(0, 0);
 	direction = glm::vec2(0, 1);
 	DT = 0.1;
+	map = m;
+	angle = 0;
 }
 
 void Tank::pressX(int x)
@@ -35,8 +37,23 @@ void Tank::realeaseZ()
 
 void Tank::update()
 {
-	direction = glm::rotate(direction, 2.0f*DT*movement.x );
+	angle += DT * movement.x;
+	direction = glm::rotate(glm::vec2(0,-1), angle );
 	position += speed * DT * direction * movement.y;
+
+	if (position.x - radius < -map->border)
+		position.x = -map->border + radius;
+	if (position.x + radius > map->border)
+		position.x = map->border - radius;
+	if (position.y - radius < -map->border)
+		position.y = -map->border + radius;
+	if (position.y + radius > map->border)
+		position.y = map->border - radius;
+}
+
+void Tank::free()
+{
+	map = nullptr;
 }
 
 Tank::~Tank()

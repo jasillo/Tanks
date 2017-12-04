@@ -6,6 +6,7 @@
 
 #include "Tank.h"
 #include "Map.h"
+#include "Enemies.h"
 
 GLsizei width = 1000, height = 500;
 std::chrono::time_point<std::chrono::system_clock> prev_time, new_time;
@@ -13,33 +14,77 @@ float DT;
 const GLfloat LightAmbient[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
 const GLfloat LightDiffuse[4] = { 1.f, 1.f, 1.f, 1.f };
 const GLfloat LightDirection[4] = { -5, 10, 2, 0 };
+const float H = 5;
+std::vector<glm::vec2> wallsX;
+std::vector<glm::vec2> wallsZ;
 
 Map map(0);
-Tank player;
-
+Tank player(&map);
+std::vector<Enemies> enemies;
+float borde;
 
 void render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	new_time = std::chrono::system_clock::now();
-	DT = (std::chrono::duration<float>(new_time - prev_time).count()); //DDDD
+	glLoadIdentity();	
 
 	glViewport(0, 0, width, height);
 	gluPerspective(60, (double)width / height, 1, 100);
-	gluLookAt(0, 25, 25, 0, 0, 0, 0, 1, 0);
+	gluLookAt(player.X() - player.direction.x * 4, 4, player.Z()- player.direction.y * 4,
+		player.X() + player.direction.x *4, 2, player.Z() + player.direction.y*4,
+		0, 1, 0);
+	
+	//graficar terreno	
+	glColor4f(0.25,0.25,0.25, 1);
+	glBegin(GL_QUADS);
+	glVertex3f(-borde,0, -borde);
+	glVertex3f(borde,0, -borde);
+	glVertex3f(borde,0 , borde);
+	glVertex3f(-borde,0, borde);
+	glEnd();
+	//graficar paredes
+	glColor4f(0.75, 0.75, 0.75, 1);
+	for (size_t i = 0; i < wallsX.size(); i++)
+	{
+	//int i = 4;
+	//std::cout << wallsX[i].x << " " << wallsX[i].y << std::endl;
+		glBegin(GL_QUADS);
+		glVertex3f(wallsX[i].x, 0, wallsX[i].y);
+		glVertex3f(wallsX[i].x, 0, wallsX[i].y + H);
+		glVertex3f(wallsX[i].x, H, wallsX[i].y + H);
+		glVertex3f(wallsX[i].x, H, wallsX[i].y);
+		glEnd();
+	}
+	glColor4f(0.65, 0.65, 0.65, 1);
+	for (size_t i = 0; i < wallsZ.size(); i++)
+	{
+		glBegin(GL_QUADS);
+		glVertex3f(wallsZ[i].x, 0, wallsZ[i].y);
+		glVertex3f(wallsZ[i].x+H, 0, wallsZ[i].y);
+		glVertex3f(wallsZ[i].x+H, H, wallsZ[i].y);
+		glVertex3f(wallsZ[i].x, H, wallsZ[i].y);
+		glEnd();
+	}
 
-	player.DT = DT;
-	prev_time = new_time;
-	player.update();
-
-	glTranslatef(player.X(),0,player.Z());
-	glutSolidSphere(1, 10, 10);
+	//dibujar jugador
+	/*glPushMatrix();
+	glRotatef(player.angle, 0, 1, 0);
+	glColor4f(1, 1, 1, 1);
+	glBegin(GL_TRIANGLES);
+	glVertex3f(-1, 1, -1);
+	glVertex3f(0, 1, 1);
+	glVertex3f(1, 1, -1);
+	glEnd();
+	glPopMatrix();*/
+	glPushMatrix();
+	glColor4f(1, 1, 1, 1);
+	glTranslatef(player.X(),1,player.Z());
+	glutSolidSphere(1, 20, 20);
+	glPopMatrix();
+	
 
 	glutSwapBuffers();
-	glFlush();
-
-	
+	glFlush();	
 }
 
 void initGL() {
@@ -61,6 +106,41 @@ void initGL() {
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, LightDiffuse);
 	glLightfv(GL_LIGHT0, GL_POSITION, LightDirection);
 	prev_time = std::chrono::system_clock::now();;
+	borde = map.tam * H / 2.0;
+
+	bool continius = false;
+	for (size_t r = 0; r < map.tam; r++)
+	{
+		for (size_t c = 0; c < map.tam; c++)
+		{
+			if (map.ground[r][c] == 0 && !continius) {
+				wallsX.push_back(glm::vec2(-map.border + c*H, -map.border + r*H));
+				continius = true;
+				//std::cout << -map.border + c*H << " " << -map.border + r*H << std::endl;
+			}
+			else if (map.ground[r][c] == 1 && continius) {
+				wallsX.push_back(glm::vec2(-map.border + c*H, -map.border + r*H));
+				continius = false;
+				//std::cout << -map.border + c*H << " " << -map.border + r*H << std::endl;
+			}
+				
+		}
+	}
+	continius = false;
+	for (size_t c = 0; c < map.tam; c++)
+	{
+		for (size_t r = 0; r < map.tam; r++)
+		{
+			if (map.ground[r][c] == 0 && !continius) {
+				wallsZ.push_back(glm::vec2(-map.border + c*H, -map.border + r*H));
+				continius = true;
+			}
+			else if (map.ground[r][c] == 1 && continius) {
+				wallsZ.push_back(glm::vec2(-map.border + c*H, -map.border + r*H));
+				continius = false;
+			}				
+		}
+	}
 }
 
 void reshape(GLsizei w, GLsizei h) {
@@ -73,18 +153,19 @@ void reshape(GLsizei w, GLsizei h) {
 }
 
 void keys(unsigned char key, int x, int y) {
-	if (key == 'r') {
-		//newGame();
+	if (key == 'x') {
+		player.free();
+		exit(1);
 	}	
 }
 
 void moveKeys(int key, int x, int y) {
 
 	if (key == GLUT_KEY_UP) {
-		player.pressZ(-1);
+		player.pressZ(1);
 	}
 	else if (key == GLUT_KEY_DOWN) {
-		player.pressZ(1);
+		player.pressZ(-1);
 	}
 	else if (key == GLUT_KEY_RIGHT) {
 		player.pressX(1);
@@ -99,6 +180,15 @@ void releaseKeys(int key, int x, int y) {
 		player.realeaseZ();
 	else if (key == GLUT_KEY_LEFT || key == GLUT_KEY_RIGHT)
 		player.realeaseX();
+}
+
+void idle() {
+	new_time = std::chrono::system_clock::now();
+	DT = (std::chrono::duration<float>(new_time - prev_time).count());
+	player.DT = DT;
+	prev_time = new_time;
+	player.update();
+	glutPostRedisplay();
 }
 
 int main(int argc, char *argv[])
@@ -117,9 +207,7 @@ int main(int argc, char *argv[])
 	glutKeyboardFunc(keys);	
 	glutSpecialFunc(moveKeys);
 	glutSpecialUpFunc(releaseKeys);
-	glutIdleFunc([]() {
-		glutPostRedisplay();
-	});
+	glutIdleFunc(idle);
 
 	glutMainLoop();
 
