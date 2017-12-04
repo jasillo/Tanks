@@ -35,6 +35,11 @@ void Tank::realeaseZ()
 	movement.y = 0;
 }
 
+float Tank::getAngle()
+{
+	return angle * 180 / pi;
+}
+
 void Tank::update()
 {
 	angle += DT * movement.x;

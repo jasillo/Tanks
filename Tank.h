@@ -5,6 +5,7 @@
 #include <iostream>
 #include "Map.h"
 
+
 class Tank
 {
 private:
@@ -15,6 +16,7 @@ private:
 	std::vector<int> bullets;
 	glm::vec2 movement;	
 	Map *map;
+	const float pi = 3.141592653589;
 
 public:
 	Tank(Map *m);
@@ -29,6 +31,7 @@ public:
 	void realeaseZ();
 	float X() { return position.x; };
 	float Z() { return position.y; };
+	float getAngle();
 
 	void update();
 	void free();

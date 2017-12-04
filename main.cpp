@@ -7,6 +7,7 @@
 #include "Tank.h"
 #include "Map.h"
 #include "Enemies.h"
+#include "Model.h"
 
 GLsizei width = 1000, height = 500;
 std::chrono::time_point<std::chrono::system_clock> prev_time, new_time;
@@ -22,6 +23,7 @@ Map map(0);
 Tank player(&map);
 std::vector<Enemies> enemies;
 float borde;
+std::vector<Model*> models;
 
 void render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -46,8 +48,6 @@ void render() {
 	glColor4f(0.75, 0.75, 0.75, 1);
 	for (size_t i = 0; i < wallsX.size(); i++)
 	{
-	//int i = 4;
-	//std::cout << wallsX[i].x << " " << wallsX[i].y << std::endl;
 		glBegin(GL_QUADS);
 		glVertex3f(wallsX[i].x, 0, wallsX[i].y);
 		glVertex3f(wallsX[i].x, 0, wallsX[i].y + H);
@@ -66,21 +66,17 @@ void render() {
 		glEnd();
 	}
 
-	//dibujar jugador
-	/*glPushMatrix();
-	glRotatef(player.angle, 0, 1, 0);
-	glColor4f(1, 1, 1, 1);
-	glBegin(GL_TRIANGLES);
-	glVertex3f(-1, 1, -1);
-	glVertex3f(0, 1, 1);
-	glVertex3f(1, 1, -1);
-	glEnd();
-	glPopMatrix();*/
+	//dibujar jugador	
 	glPushMatrix();
 	glColor4f(1, 1, 1, 1);
-	glTranslatef(player.X(),1,player.Z());
-	glutSolidSphere(1, 20, 20);
+	glTranslatef(player.X(),0,player.Z());
+	glRotatef(180-player.getAngle(), 0, 1, 0);
+	//std::cout << player.getAngle() << std::endl;
+	glScalef(0.6, 0.6, 0.6);
+	models[0]->draw();
 	glPopMatrix();
+	
+	//glScalef(0.1, 0.1, 0.1);
 	
 
 	glutSwapBuffers();
@@ -141,6 +137,8 @@ void initGL() {
 			}				
 		}
 	}
+	models.push_back(Model::getModel("MetalKabuterimon"));
+	models.push_back(Model::getModel("AirStrike"));
 }
 
 void reshape(GLsizei w, GLsizei h) {
