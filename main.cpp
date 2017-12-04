@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include "Tank.h"
+#include "Map.h"
 
 GLsizei width = 1000, height = 500;
 std::chrono::time_point<std::chrono::system_clock> prev_time, new_time;
@@ -12,7 +13,10 @@ float DT;
 const GLfloat LightAmbient[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
 const GLfloat LightDiffuse[4] = { 1.f, 1.f, 1.f, 1.f };
 const GLfloat LightDirection[4] = { -5, 10, 2, 0 };
+
+Map map(0);
 Tank player;
+
 
 void render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -26,6 +30,7 @@ void render() {
 	gluLookAt(0, 25, 25, 0, 0, 0, 0, 1, 0);
 
 	player.DT = DT;
+	prev_time = new_time;
 	player.update();
 
 	glTranslatef(player.X(),0,player.Z());
@@ -34,7 +39,7 @@ void render() {
 	glutSwapBuffers();
 	glFlush();
 
-	prev_time = new_time;
+	
 }
 
 void initGL() {
