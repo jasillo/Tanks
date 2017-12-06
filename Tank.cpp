@@ -2,16 +2,15 @@
 
 
 
-Tank::Tank(Map *m)
+Tank::Tank()
 {
 	lifePoints = 500;
 	speed = 7.0;
 	armor = 1.0;
 	position = glm::vec2(0, 0);
 	movement = glm::vec2(0, 0);
-	direction = glm::vec2(0, 1);
-	DT = 0.05;
-	map = m;
+	direction = glm::vec2(0, 1);	
+	//map = m;
 	angle = 0;
 }
 
@@ -40,28 +39,16 @@ float Tank::getAngle()
 	return angle * 180 / pi;
 }
 
-void Tank::update()
+void Tank::update(float DT)
 {
 	angle += DT * movement.x;
-	direction = glm::rotate(glm::vec2(0,-1), angle );
-	position += speed * DT * direction * movement.y;
-
-	if (position.x - radius < -map->border)
-		position.x = -map->border + radius;
-	if (position.x + radius > map->border)
-		position.x = map->border - radius;
-	if (position.y - radius < -map->border)
-		position.y = -map->border + radius;
-	if (position.y + radius > map->border)
-		position.y = map->border - radius;
-	
-	map->collision(&position, radius);
-	
+	direction = glm::rotate(glm::vec2(0, -1), angle);
+	position += speed * DT * direction * movement.y;	
 }
 
 void Tank::free()
 {
-	map = nullptr;
+	//map = nullptr;
 }
 
 Tank::~Tank()

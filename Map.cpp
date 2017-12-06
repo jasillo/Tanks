@@ -1,7 +1,46 @@
 #include "Map.h"
 
-Map::Map(int i)
+int Map::getWord(std::string * s)
 {
+	int pos;
+	//eliminar espacios en blanco al inicio, trim
+	for (pos = 0; pos < s->size() && s->at(pos) == ' '; ++pos) {};
+	*s = s->substr(pos);
+	if (s->empty())
+		return 0;
+	//obtencion de la primera palabra
+	for (pos = 0; pos < s->size() && s->at(pos) != ' '; ++pos) {};
+	std::string word = s->substr(0, pos);
+	*s = s->substr(pos);
+	return std::stoi(word);
+}
+
+glm::vec2 Map::randomPos()
+{
+	int i = rand() % 8;
+	return initialPos[i];
+}
+
+void Map::update(float DT)
+{
+	//actualizar player
+	player->update(DT);
+	if (player->position.x - player->radius < -border)
+		player->position.x = -border + player->radius;
+	if (player->position.x + player->radius > border)
+		player->position.x = border - player->radius;
+	if (player->position.y - player->radius < -border)
+		player->position.y = -border + player->radius;
+	if (player->position.y + player->radius > border)
+		player->position.y = border - player->radius;
+	collision(&player->position, player->radius);
+
+}
+
+Map::Map(int i, int lv)
+{
+	level = lv;
+	srand(time(NULL));
 	std::string line;
 	std::ifstream myfile(files[i]);
 	if (myfile.is_open())
@@ -14,19 +53,30 @@ Map::Map(int i)
 			ground[i] = new int[tam];
 
 		int r = -1;
-		while (getline(myfile, line))
+		for (size_t r = 0; r < tam; r++)
 		{
-			r++;
+			getline(myfile, line);
 			for (size_t c = 0; c < tam; c++)
 			{
 				if (line[c] == '1')
 					ground[r][c] = 1;
-				else 
+				else
 					ground[r][c] = 0;
 			}
 		}
+		
+		for (size_t i = 0; i < 8; i++)
+		{
+			getline(myfile, line);
+			int x = getWord(&line);
+			int y = getWord(&line);
+			initialPos.push_back(glm::vec2(x,y));
+		}
+
 		myfile.close();
 		border = tam * H / 2.0;
+
+
 	}
 
 	centers = new glm::vec2*[tam];
@@ -42,6 +92,8 @@ Map::Map(int i)
 		}
 		//std::cout<< std::endl;
 	}
+
+	player = new Tank();
 }
 
 bool Map::collision(glm::vec2 *pos, float radius)

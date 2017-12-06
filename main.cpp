@@ -4,14 +4,14 @@
 #include <GL/glut.h>
 #include <chrono>
 
-#include "Tank.h"
 #include "Map.h"
-#include "Enemies.h"
 #include "Model.h"
 
 GLsizei width = 1000, height = 500;
 std::chrono::time_point<std::chrono::system_clock> prev_time, new_time;
 float DT;
+int level = 1;
+
 const GLfloat LightAmbient[4] = { 0.6f, 0.6f, 0.6f, 1.0f };
 const GLfloat LightDiffuse[4] = { 1.f, 1.f, 1.f, 1.f };
 const GLfloat LightDirection[4] = { -5, 10, 2, 0 };
@@ -19,9 +19,8 @@ const float H = 5;
 std::vector<glm::vec2> wallsX;
 std::vector<glm::vec2> wallsZ;
 
-Map map(0);
-Tank player(&map);
-std::vector<Enemies> enemies;
+
+Map map(0,level);
 float borde;
 std::vector<Model*> models;
 
@@ -32,8 +31,8 @@ void render() {
 
 	glViewport(0, 0, width, height);
 	gluPerspective(60, (double)width / height, 1, 100);
-	gluLookAt(player.X() - player.direction.x * 4, 4, player.Z()- player.direction.y * 4,
-		player.X() + player.direction.x *4, 2, player.Z() + player.direction.y*4,
+	gluLookAt(map.player->X() - map.player->direction.x * 4, 4, map.player->Z()- map.player->direction.y * 4,
+		map.player->X() + map.player->direction.x *4, 2, map.player->Z() + map.player->direction.y*4,
 		0, 1, 0);
 	
 	//graficar terreno	
@@ -65,19 +64,29 @@ void render() {
 		glVertex3f(wallsZ[i].x, H, wallsZ[i].y);
 		glEnd();
 	}
-
+	
 	//dibujar jugador	
 	glPushMatrix();
 	glColor4f(1, 1, 1, 1);
-	glTranslatef(player.X(),0,player.Z());
-	glRotatef(180-player.getAngle(), 0, 1, 0);
+	glTranslatef(map.player->X(),0,map.player->Z());
+	glRotatef(180-map.player->getAngle(), 0, 1, 0);
 	//std::cout << player.getAngle() << std::endl;
 	glScalef(0.5, 0.5, 0.5);
 	models[0]->draw();
 	glPopMatrix();
 	
 	//glScalef(0.1, 0.1, 0.1);
-	
+	//dibujar enemigos
+	/*for (size_t i = 0; i < map.enemies.size(); i++)
+	{
+		glPushMatrix();
+		glColor4f(1, 1, 1, 1);
+		glTranslatef(map.enemies[i]->X(), 1, map.enemies[i]->Z());
+		//glRotatef(180 - player.getAngle(), 0, 1, 0);
+		glScalef(0.5, 0.5, 0.5);
+		models[1]->draw();
+		glPopMatrix();
+	}*/	
 
 	glutSwapBuffers();
 	glFlush();	
@@ -152,7 +161,7 @@ void reshape(GLsizei w, GLsizei h) {
 
 void keys(unsigned char key, int x, int y) {
 	if (key == 'x') {
-		player.free();
+		//player.free();
 		exit(1);
 	}	
 }
@@ -160,32 +169,48 @@ void keys(unsigned char key, int x, int y) {
 void moveKeys(int key, int x, int y) {
 
 	if (key == GLUT_KEY_UP) {
-		player.pressZ(1);
+		map.player->pressZ(1);
 	}
 	else if (key == GLUT_KEY_DOWN) {
-		player.pressZ(-1);
+		map.player->pressZ(-1);
 	}
 	else if (key == GLUT_KEY_RIGHT) {
-		player.pressX(1);
+		map.player->pressX(1);
 	}
 	else if (key == GLUT_KEY_LEFT) {
-		player.pressX(-1);
+		map.player->pressX(-1);
 	}
 }
 
 void releaseKeys(int key, int x, int y) {
 	if (key == GLUT_KEY_UP || key == GLUT_KEY_DOWN)
-		player.realeaseZ();
+		map.player->realeaseZ();
 	else if (key == GLUT_KEY_LEFT || key == GLUT_KEY_RIGHT)
-		player.realeaseX();
+		map.player->realeaseX();
 }
 
 void idle() {
 	new_time = std::chrono::system_clock::now();
 	DT = (std::chrono::duration<float>(new_time - prev_time).count());
-	player.DT = DT;
 	prev_time = new_time;
-	player.update();
+	/*
+	enemiesTime += DT;
+
+	if (enemiesTime > 2.0 && enemies.size() <= maxEnemies) {
+		enemies.push_back(new Enemies(level, &map, enemiePos));
+		enemiesTime = 0;
+		//std::cout << "creado" << std::endl;
+	}
+	else if (enemiesTime > 1.5) {
+		enemiePos = map.randomPos();
+	}
+		*/
+	map.update(DT);
+	/*for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->update(DT);
+	}*/
+
 	glutPostRedisplay();
 }
 

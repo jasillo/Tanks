@@ -1,6 +1,6 @@
 #pragma once
-#ifndef VIDEOGAME_MODEL_H
-#define VIDEOGAME_MODEL_H
+#ifndef _MODEL_H
+#define _MODEL_H
 
 #include <iostream>
 #include <vector>
@@ -35,4 +35,4 @@ private:
 };
 
 
-#endif //VIDEOGAME_MODEL_H
+#endif //_MODEL_H
