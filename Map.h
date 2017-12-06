@@ -13,15 +13,6 @@
 #include "Tank.h"
 #include "Enemies.h"
 
-struct Node {
-	int StartCost; 
-	int TotalCost; 
-	int X, Y; 
-	int ParentX, ParentY; //parent	x, y
-};
-
-
-
 class Map
 {
 private:		
@@ -29,8 +20,9 @@ private:
 	int getWord(std::string *s);
 	int level;
 	float enemiesTime;
-	int maxEnemies = 4;
+	int maxEnemies = 1;
 	glm::vec2 enemiePos;
+	AStar finder;
 
 	void createEnemie(float DT);
 public:

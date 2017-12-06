@@ -20,9 +20,10 @@ void Map::createEnemie(float DT)
 	enemiesTime += DT;
 		
 	if (enemiesTime > 2.0) {
-		if (enemies.size() <= maxEnemies) 
-			enemies.push_back(new Enemies(level, enemiePos));			
-		
+		if (enemies.size() < maxEnemies) {
+			enemies.push_back(new Enemies(level, enemiePos));
+			enemies.back()->finder.copyGround(ground, tam);
+		}		
 		enemiesTime = 0;
 		return;
 		//std::cout << "creado" << std::endl;
@@ -43,27 +44,13 @@ void Map::update(float DT)
 	createEnemie(DT);
 	//actualizar player
 	player->update(DT);
-	if (player->position.x - player->radius < -border)
-		player->position.x = -border + player->radius;
-	if (player->position.x + player->radius > border)
-		player->position.x = border - player->radius;
-	if (player->position.y - player->radius < -border)
-		player->position.y = -border + player->radius;
-	if (player->position.y + player->radius > border)
-		player->position.y = border - player->radius;
+	collisionBorder(&player->position, player->radius);	
 	collision(&player->position, player->radius);
 	//actualizar enemigos
 	for (size_t i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->update(DT);
-		if (enemies[i]->position.x - enemies[i]->radius < -border)
-			enemies[i]->position.x = -border + enemies[i]->radius;
-		if (enemies[i]->position.x + enemies[i]->radius > border)
-			enemies[i]->position.x = border - enemies[i]->radius;
-		if (enemies[i]->position.y - enemies[i]->radius < -border)
-			enemies[i]->position.y = -border + enemies[i]->radius;
-		if (enemies[i]->position.y + enemies[i]->radius > border)
-			enemies[i]->position.y = border - enemies[i]->radius;
+		enemies[i]->update(DT, player->position,border, H, h);
+		collisionBorder(&enemies[i]->position, enemies[i]->radius);		
 		collision(&enemies[i]->position, enemies[i]->radius);
 	}
 }
@@ -75,8 +62,7 @@ Map::Map(int i, int lv)
 	std::string line;
 	std::ifstream myfile(files[i]);
 	if (myfile.is_open())
-	{
-		
+	{		
 		getline(myfile, line);
 		tam = std::stoi(line);
 		ground = new int* [tam];
@@ -113,18 +99,13 @@ Map::Map(int i, int lv)
 		centers[i] = new glm::vec2[tam];
 
 	for (size_t r = 0; r < tam; r++)
-	{
 		for (size_t c = 0; c < tam; c++)
-		{
 			centers[r][c] = glm::vec2(-border + H/2.0 + c*H, -border + H /2.0 + r*H);
-			//std::cout << centers[r][c].x<<" " << centers[r][c].y<<"     ";
-		}
-		//std::cout<< std::endl;
-	}
 
 	player = new Tank();
 	enemiesTime = 0;
 	enemiePos = randomPos();
+	finder.copyGround(ground, tam);
 }
 
 bool Map::collision(glm::vec2 *pos, float radius)
