@@ -3,22 +3,22 @@
 #define _ENEMIES_H
 
 #include <glm\glm.hpp>
-#include "Map.h"
+#include <glm\gtx\rotate_vector.hpp>
 
 class Enemies
 {
 private:
 	float lifePoints;
-	float speed;
-	glm::vec2 position;
+	float speed;	
 	glm::vec2 direction;
 	float armor;
 	float timer;
-	Map *map;
-	float radius = 1.0;
+	
 
 public:
-	Enemies(int lv, Map *m, glm::vec2 pos);
+	float radius = 1.0;
+	glm::vec2 position;
+	Enemies(int lv, glm::vec2 pos);
 	void update(float DT);
 	void free();
 	~Enemies();

@@ -2,24 +2,25 @@
 
 
 
-Enemies::Enemies(int lv, Map *m, glm::vec2 pos)
+Enemies::Enemies(int lv, glm::vec2 pos)
 {
 	lifePoints = 500 + lv * 25.0;
 	speed = 3 + lv * 0.25;
-	armor = 100 + lv * 10;
-	map = m;
-	position.x = -map->border + pos.x * map->H + map->h;
-	position.y = -map->border + pos.y * map->H + map->h;
+	armor = 100 + lv * 10;	
+	position = pos;
+	direction = glm::vec2(1,0);
 }
 
 void Enemies::update(float DT)
 {
-
+	//angle += DT * movement.x;
+	//direction = glm::rotate(glm::vec2(0, -1), 100);
+	position += speed * DT * direction;
 }
 
 void Enemies::free()
 {
-	map = nullptr;
+	
 }
 
 Enemies::~Enemies()

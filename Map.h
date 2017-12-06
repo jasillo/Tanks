@@ -11,8 +11,7 @@
 #include <time.h>       /* time */
 
 #include "Tank.h"
-//#include "Enemies.h"
-
+#include "Enemies.h"
 
 struct Node {
 	int StartCost; 
@@ -29,7 +28,11 @@ private:
 	const std::vector< std::string> files = {"mapa1.txt", "mapa2.txt"};
 	int getWord(std::string *s);
 	int level;
+	float enemiesTime;
+	int maxEnemies = 4;
+	glm::vec2 enemiePos;
 
+	void createEnemie(float DT);
 public:
 	const float H = 5.0;
 	const float h = H / 2.0;
@@ -39,13 +42,14 @@ public:
 	float border;
 	std::vector<glm::vec2> initialPos;
 	Tank *player;
-	//std::vector<Enemies *>enemies;
+	std::vector<Enemies *>enemies;
 	
 	glm::vec2 randomPos();
 	void update(float DT);	
 	
 	Map(int i, int lv);
 	bool collision(glm::vec2 *pos, float radius);
+	void collisionBorder(glm::vec2 *pos, float radius);
 	~Map();
 };
 

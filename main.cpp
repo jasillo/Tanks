@@ -77,7 +77,7 @@ void render() {
 	
 	//glScalef(0.1, 0.1, 0.1);
 	//dibujar enemigos
-	/*for (size_t i = 0; i < map.enemies.size(); i++)
+	for (size_t i = 0; i < map.enemies.size(); i++)
 	{
 		glPushMatrix();
 		glColor4f(1, 1, 1, 1);
@@ -86,7 +86,7 @@ void render() {
 		glScalef(0.5, 0.5, 0.5);
 		models[1]->draw();
 		glPopMatrix();
-	}*/	
+	}
 
 	glutSwapBuffers();
 	glFlush();	
@@ -193,23 +193,8 @@ void idle() {
 	new_time = std::chrono::system_clock::now();
 	DT = (std::chrono::duration<float>(new_time - prev_time).count());
 	prev_time = new_time;
-	/*
-	enemiesTime += DT;
-
-	if (enemiesTime > 2.0 && enemies.size() <= maxEnemies) {
-		enemies.push_back(new Enemies(level, &map, enemiePos));
-		enemiesTime = 0;
-		//std::cout << "creado" << std::endl;
-	}
-	else if (enemiesTime > 1.5) {
-		enemiePos = map.randomPos();
-	}
-		*/
-	map.update(DT);
-	/*for (size_t i = 0; i < enemies.size(); i++)
-	{
-		enemies[i]->update(DT);
-	}*/
+	
+	map.update(DT);	
 
 	glutPostRedisplay();
 }

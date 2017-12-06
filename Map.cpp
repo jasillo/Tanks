@@ -15,6 +15,23 @@ int Map::getWord(std::string * s)
 	return std::stoi(word);
 }
 
+void Map::createEnemie(float DT)
+{
+	enemiesTime += DT;
+		
+	if (enemiesTime > 2.0) {
+		if (enemies.size() <= maxEnemies) 
+			enemies.push_back(new Enemies(level, enemiePos));			
+		
+		enemiesTime = 0;
+		return;
+		//std::cout << "creado" << std::endl;
+	}
+	else if (enemiesTime > 1.5) {
+		enemiePos = randomPos();
+	}
+}
+
 glm::vec2 Map::randomPos()
 {
 	int i = rand() % 8;
@@ -23,6 +40,7 @@ glm::vec2 Map::randomPos()
 
 void Map::update(float DT)
 {
+	createEnemie(DT);
 	//actualizar player
 	player->update(DT);
 	if (player->position.x - player->radius < -border)
@@ -34,7 +52,20 @@ void Map::update(float DT)
 	if (player->position.y + player->radius > border)
 		player->position.y = border - player->radius;
 	collision(&player->position, player->radius);
-
+	//actualizar enemigos
+	for (size_t i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->update(DT);
+		if (enemies[i]->position.x - enemies[i]->radius < -border)
+			enemies[i]->position.x = -border + enemies[i]->radius;
+		if (enemies[i]->position.x + enemies[i]->radius > border)
+			enemies[i]->position.x = border - enemies[i]->radius;
+		if (enemies[i]->position.y - enemies[i]->radius < -border)
+			enemies[i]->position.y = -border + enemies[i]->radius;
+		if (enemies[i]->position.y + enemies[i]->radius > border)
+			enemies[i]->position.y = border - enemies[i]->radius;
+		collision(&enemies[i]->position, enemies[i]->radius);
+	}
 }
 
 Map::Map(int i, int lv)
@@ -64,19 +95,17 @@ Map::Map(int i, int lv)
 					ground[r][c] = 0;
 			}
 		}
+		border = tam * H / 2.0;
 		
 		for (size_t i = 0; i < 8; i++)
 		{
 			getline(myfile, line);
-			int x = getWord(&line);
-			int y = getWord(&line);
+			float x = -border + H*getWord(&line) + h;
+			float y = -border + H*getWord(&line) + h;
 			initialPos.push_back(glm::vec2(x,y));
 		}
 
 		myfile.close();
-		border = tam * H / 2.0;
-
-
 	}
 
 	centers = new glm::vec2*[tam];
@@ -94,14 +123,14 @@ Map::Map(int i, int lv)
 	}
 
 	player = new Tank();
+	enemiesTime = 0;
+	enemiePos = randomPos();
 }
 
 bool Map::collision(glm::vec2 *pos, float radius)
 {
 	int c = (border + pos->x) / H;
 	int r = (border + pos->y) / H;
-	//std::cout << r << " " << c << std::endl;
-	//std::cout << pos->x + radius << " " << centers[r][c + 1].x - h << std::endl;
 	if (c + 1 < tam && ground[r][c+1] == 0) {
 		if (pos->x + radius > centers[r][c+1].x - h)
 			pos->x = centers[r][c+1].x - h - radius;
@@ -120,6 +149,18 @@ bool Map::collision(glm::vec2 *pos, float radius)
 	}
 	
 	return false;
+}
+
+void Map::collisionBorder(glm::vec2 * pos, float radius)
+{
+	if (pos->x - radius < -border)
+		pos->x = -border + radius;
+	if (pos->x + radius > border)
+		pos->x = border - radius;
+	if (pos->y - radius < -border)
+		pos->y = -border + radius;
+	if (pos->y + radius > border)
+		pos->y = border - radius;
 }
 
 Map::~Map()
