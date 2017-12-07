@@ -5,7 +5,7 @@
 Enemies::Enemies(int lv, glm::vec2 pos)
 {
 	lifePoints = 500 + lv * 25.0;
-	speed = 3 + lv * 0.25;
+	speed = 5 + lv * 0.25;
 	armor = 100 + lv * 10;	
 	position = pos;
 	direction = glm::vec2(1,0);
@@ -36,12 +36,12 @@ void Enemies::update(float DT, glm::vec2 player, float border, float H, float h)
 		int c = (border + position.x) / H;
 		int r = (border + position.y) / H;
 
-		if (c == dir.x && r == dir.y) {
-			dir = finder.next();
+		if (c == dir.x && r == dir.y) {			
 			if (finder.path.size() == 0) {
 				state = 0;
 				return;
 			}
+			dir = finder.next();
 			//std::cout << dir.x << "," << dir.y << std::endl;
 			direction = glm::normalize((glm::vec2(-border + H *dir.x+h, -border + H *dir.y+h)) - position);
 			//std::cout << direction.x << "," << direction.y << std::endl;
